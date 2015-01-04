@@ -1,0 +1,1 @@
+angular.module('ecaps.services', []).factory('Control', function () {});

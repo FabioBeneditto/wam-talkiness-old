@@ -1,0 +1,25 @@
+<ion-view view-title="Controle Remoto">
+    <ion-content class="padding auto-height">
+        <div class="row">
+            <div class="col col-offset-33 col-33 col-center text-center">
+                <button type="button" ng-click="socketEmit('up')" class="button button-icon icon ion-chevron-up"></button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-33 col-center text-center">
+                <button type="button" ng-click="socketEmit('left')" class="button button-icon icon ion-chevron-left"></button>
+            </div>
+            <div class="col col-33 col-center text-center">
+                <button type="button" ng-click="socketEmit('start')" class="button button-icon icon ion-grid"></button>
+            </div>
+            <div class="col col-33 col-center text-center">
+                <button type="button" ng-click="socketEmit('right')" class="button button-icon icon ion-chevron-right"></button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-offset-33 col-33 col-center text-center">
+                <button type="button" ng-click="socketEmit('down')" class="button button-icon icon ion-chevron-down"></button>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
