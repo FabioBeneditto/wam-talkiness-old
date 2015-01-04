@@ -1,0 +1,6 @@
+.auto-height .scroll{
+    height: 100%;
+}
+.auto-height .scroll .row{
+    height: 33.33%;
+}
