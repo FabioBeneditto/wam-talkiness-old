@@ -1,8 +1,37 @@
 var express = require('express');
 var fs = require('fs');
 var io = require('socket.io');
-var _ = require('underscore');
-var Mustache = require('mustache');
+
+var mongoose = require('mongoose');
+$con = mongoose.connect('mongodb://localhost/wam_talkiness');
+mongoose.connection.once('connected', function (error) {
+    if (error) {
+        console.log(error);
+    } else {
+        console.log("Connected to database");
+    }
+});
+var Schema = mongoose.Schema;
+var QuestionSchema = new Schema({
+    name: String,
+    email: String,
+    question: String,
+    hashGravatar: String
+});
+
+
+var Question = mongoose.model('questions', QuestionSchema);
+//mongoose.dropCollections = function (callback) {
+//    var collections = _.keys(mongoose.connection.collections)
+//    async.forEach(collections, function (collectionName, done) {
+//        var collection = mongoose.connection.collections[collectionName]
+//        collection.drop(function (err) {
+//            if (err && err.message != 'ns not found')
+//                done(err)
+//            done(null)
+//        })
+//    }, callback)
+//}
 
 var app = express.createServer();
 var staticDir = express.static;
@@ -26,6 +55,10 @@ function getAddresses(cb) {
         }
     }
 }
+
+app.configure(function () {
+    app.use(express.bodyParser());
+});
 
 io.sockets.on('connection', function (socket) {
     socket.on('slidechanged', function (slideData) {
@@ -80,6 +113,10 @@ app.get("/speaker", function (req, res) {
     fs.createReadStream(opts.baseDir + 'speaker/index.html').pipe(res);
 });
 
+app.get("/public", function (req, res) {
+    fs.createReadStream(opts.baseDir + 'public/index.html').pipe(res);
+});
+
 app.get("/css/*", function (req, res) {
     fs.createReadStream(opts.baseDir + 'assets/css/' + req.params[0]).pipe(res);
 });
@@ -96,6 +133,33 @@ app.get("/fonts/*", function (req, res) {
     fs.createReadStream(opts.baseDir + 'assets/fonts/' + req.params[0]).pipe(res);
 });
 
+app.get('/questions/get', function (req, res) {
+    Question.find({}, function (err, docs) {
+        res.json(docs);
+    });
+});
+
+app.get('/questions/get/:objectID', function (req, res) {
+    alert('oi')
+//    Question.find({}, function (err, docs) {
+//        res.json(docs);
+//    });
+});
+
+app.post('/questions/add', function (req, res) {
+    var $question = new Question(req.body);
+    $question.save(function (error, data) {
+        if (error) {
+            error.success = false;
+            res.json(error);
+        }
+        else {
+            data.success = true;
+            res.json(data);
+        }
+    });
+});
+
 // Actually listen
 app.listen(opts.port || null);
 
@@ -107,5 +171,5 @@ var slidesLocation = "http://localhost" + (opts.port ? (':' + opts.port) : '');
 
 console.log(brown + "reveal.js - WebRTC Server and socket.io remote control" + reset);
 getAddresses(function (address) {
-    console.log('Your server is listening on http://' + address + ':1947/');
+    console.log(green + 'Your server is listening on http://' + address + ':1947/' + reset);
 });
